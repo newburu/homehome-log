@@ -1,0 +1,29 @@
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6 text-center">今日の誉められること</h1>
+  
+  <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <%= form_with url: praises_path, method: :post, local: true, data: { turbo: false } do |f| %>
+      <% if @praises.any? %>
+        <div class="space-y-4 mb-8">
+          <% @praises.each_with_index do |praise, index| %>
+            <div class="flex items-start p-4 border rounded hover:bg-gray-50 transition cursor-pointer" onclick="document.getElementById('praise_<%= index %>').click()">
+              <div class="flex items-center h-5">
+                <%= check_box_tag "praises[]", praise, false, id: "praise_#{index}", class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" %>
+              </div>
+              <div class="ml-3 text-sm">
+                <%= label_tag "praise_#{index}", praise, class: "font-medium text-gray-700 cursor-pointer" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-center text-gray-500 mb-8">提案を取得できませんでした。もう一度試してみてください。</p>
+      <% end %>
+
+      <div class="flex items-center justify-between">
+        <%= f.submit "保存して次へ", name: "next", class: "bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full md:w-auto" %>
+        <%= link_to "ログ一覧を見る", logs_path, class: "inline-block align-baseline font-bold text-sm text-indigo-600 hover:text-indigo-800" %>
+      </div>
+    <% end %>
+  </div>
+</div>

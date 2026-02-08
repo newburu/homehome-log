@@ -1,0 +1,26 @@
+<div class="max-w-md mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold mb-6">ログの編集</h1>
+
+  <%= form_with(model: @log, local: true) do |f| %>
+    <% if @log.errors.any? %>
+      <div class="bg-red-50 text-red-700 p-4 rounded mb-4">
+        <h2><%= pluralize(@log.errors.count, "error") %> prohibited this log from being saved:</h2>
+        <ul class="list-disc list-inside">
+          <% @log.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-4">
+      <%= f.label :content, "内容", class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= f.text_area :content, rows: 4, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <%= f.submit "更新する", class: "bg-indigo-600 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+      <%= link_to "戻る", logs_path, class: "inline-block align-baseline font-bold text-sm text-indigo-600 hover:text-indigo-800" %>
+    </div>
+  <% end %>
+</div>

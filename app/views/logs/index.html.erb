@@ -1,0 +1,43 @@
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">
+      <% if params[:date] %>
+        <%= l(params[:date].to_date, format: :long) %> のログ
+      <% else %>
+        ログ一覧
+      <% end %>
+    </h1>
+    <div>
+      <%= link_to "カレンダー", calendar_logs_path, class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" %>
+      <%= link_to "誉められることを見つける", praises_path, class: "bg-indigo-600 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+  </div>
+
+  <% if @logs.any? %>
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <ul class="divide-y divide-gray-200">
+        <% @logs.each do |log| %>
+          <li>
+            <div class="px-4 py-4 sm:px-6 hover:bg-gray-50 flex items-center justify-between">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-indigo-600 truncate"><%= log.content %></p>
+                <p class="flex items-center text-sm text-gray-500">
+                  <span class="truncate"><%= l(log.created_at, format: :long) %></span>
+                </p>
+              </div>
+              <div class="flex space-x-2">
+                <%= link_to '編集', edit_log_path(log), class: "text-indigo-600 hover:text-indigo-900 text-sm" %>
+                <%= button_to '削除', log_path(log), method: :delete, data: { turbo_confirm: '本当に削除しますか？' }, class: "text-red-600 hover:text-red-900 text-sm bg-transparent border-0 cursor-pointer" %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+    <div class="mt-4">
+      <%= paginate @logs %>
+    </div>
+  <% else %>
+    <p class="text-center text-gray-500 mt-8">ログはまだありません。</p>
+  <% end %>
+</div>

@@ -1,0 +1,21 @@
+<header class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+  <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+    <%= link_to root_path, class: "text-2xl font-bold tracking-tight text-gray-900 hover:text-blue-600 transition-colors" do %>
+      ほめほめログ<span class="text-blue-500">.</span>
+    <% end %>
+
+    <nav class="flex items-center gap-4">
+      <% if user_signed_in? %>
+        <%= link_to "ログ一覧", logs_path, class: "text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors" %>
+        <%= link_to "カレンダー", calendar_logs_path, class: "text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors" %>
+        
+        <div class="h-4 w-px bg-gray-200 mx-2"></div>
+        
+        <span class="text-sm text-gray-500 hidden sm:inline"><%= current_user.name %></span>
+        <%= button_to "ログアウト", destroy_user_session_path, method: :delete, data: { turbo: false }, class: "text-sm font-medium text-red-500 hover:text-red-700 transition-colors ml-2" %>
+      <% else %>
+        <%= link_to "トップ", root_path, class: "text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors" %>
+      <% end %>
+    </nav>
+  </div>
+</header>

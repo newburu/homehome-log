@@ -1,0 +1,47 @@
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">カレンダー</h1>
+    <div>
+      <%= link_to "一覧へ戻る", logs_path, class: "text-indigo-600 hover:text-indigo-800" %>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center mb-4">
+    <%= link_to "← 前月", calendar_logs_path(month: @month.prev_month), class: "text-gray-600 hover:text-gray-900" %>
+    <h2 class="text-xl font-bold"><%= @month.strftime("%Y年 %m月") %></h2>
+    <%= link_to "翌月 →", calendar_logs_path(month: @month.next_month), class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+
+  <div class="grid grid-cols-7 border-t border-l border-gray-200">
+    <% %w[日 月 火 水 木 金 土].each do |day| %>
+      <div class="py-2 text-center bg-gray-100 border-r border-b border-gray-200 font-bold text-gray-700"><%= day %></div>
+    <% end %>
+
+    <% @date_range.each do |date| %>
+      <% logs = @logs_by_date[date] || [] %>
+      <% is_today = date == Date.current %>
+      <% is_current_month = date.month == @month.month %>
+      
+      <div class="relative h-32 border-r border-b border-gray-200 p-2 <%= is_current_month ? 'bg-white' : 'bg-gray-50' %> <%= is_today ? 'bg-yellow-50' : '' %> hover:bg-gray-50 transition">
+        <span class="block text-sm <%= is_current_month ? 'text-gray-900' : 'text-gray-400' %> <%= is_today ? 'font-bold text-indigo-600' : '' %>">
+          <%= date.day %>
+        </span>
+        
+        <% if logs.any? %>
+          <%= link_to logs_path(date: date), class: "mt-2 block w-full h-full" do %>
+            <div class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-1 rounded text-center">
+              <%= logs.count %>件のログ
+            </div>
+            <% if logs.count <= 3 %>
+              <div class="mt-1 space-y-1">
+                <% logs.each do |log| %>
+                  <p class="text-xs text-gray-500 truncate">• <%= log.content %></p>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
