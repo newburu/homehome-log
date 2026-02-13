@@ -1,7 +1,8 @@
 <header class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
   <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-    <%= link_to root_path, class: "text-2xl font-bold tracking-tight text-gray-900 hover:text-blue-600 transition-colors" do %>
-      ほめほめログ<span class="text-blue-500">.</span>
+    <%= link_to root_path, class: "flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 hover:text-blue-600 transition-colors" do %>
+      <%= image_tag "/icon.png", class: "w-8 h-8", alt: "ほめほめログ" %>
+      <span>ほめほめログ<span class="text-blue-500">.</span></span>
     <% end %>
 
     <nav class="hidden md:flex items-center gap-4">
