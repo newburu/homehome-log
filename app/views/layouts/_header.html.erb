@@ -4,7 +4,7 @@
       ほめほめログ<span class="text-blue-500">.</span>
     <% end %>
 
-    <nav class="flex items-center gap-4">
+    <nav class="hidden md:flex items-center gap-4">
       <% if user_signed_in? %>
         <%= link_to "ログ一覧", logs_path, class: "text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors" %>
         <%= link_to "カレンダー", calendar_logs_path, class: "text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors" %>
@@ -17,5 +17,25 @@
         <%= link_to "トップ", root_path, class: "text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors" %>
       <% end %>
     </nav>
+
+    <div data-controller="menu" class="md:hidden">
+      <button data-action="click->menu#toggle" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+
+      <div data-menu-target="mobileMenu" class="hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-lg p-4 flex flex-col gap-4">
+        <% if user_signed_in? %>
+          <%= link_to "ログ一覧", logs_path, class: "block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors py-2" %>
+          <%= link_to "カレンダー", calendar_logs_path, class: "block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors py-2" %>
+          <div class="h-px w-full bg-gray-100 my-1"></div>
+          <span class="block text-sm text-gray-500 py-2"><%= current_user.name %></span>
+          <%= button_to "ログアウト", destroy_user_session_path, method: :delete, data: { turbo: false }, class: "w-full text-left text-sm font-medium text-red-500 hover:text-red-700 transition-colors py-2" %>
+        <% else %>
+          <%= link_to "トップ", root_path, class: "block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors py-2" %>
+        <% end %>
+      </div>
+    </div>
   </div>
 </header>
