@@ -19,7 +19,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_13_131100) do
     t.index ["user_id"], name: "index_logs_on_user_id"
   end
 
-  create_table "users", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email"
     t.string "encrypted_password"
