@@ -57,8 +57,8 @@ production:
   primary: &primary_production
     <<: *default
     database: homehome_log_production
-    username: homehome_log
-    password: <%= ENV["HOMEHOME_LOG_DATABASE_PASSWORD"] %>
+    username: <%= ENV.fetch("DB_USERNAME", "homehome_log") %>
+    password: <%= ENV.fetch("DB_PASSWORD") %>
   cache:
     <<: *primary_production
     database: homehome_log_production_cache
