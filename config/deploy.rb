@@ -13,3 +13,8 @@ set :rbenv_ruby, "4.0.0"
 
 append :linked_files, "config/database.yml", ".env", "config/master.key"
 append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system", "vendor", "storage"
+
+# Puma Systemd Config
+set :puma_service_unit_name, "puma_homehome_log_production"
+set :puma_systemctl_user, :user # Use user mode systemd
+set :puma_enable_socket_service, true # Enable socket activation
