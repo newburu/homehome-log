@@ -4,7 +4,7 @@ class PraisesController < ApplicationController
   def index
     # Get recent logs to exclude from suggestions
     recent_logs = current_user.logs.order(created_at: :desc).limit(30).pluck(:content)
-    @praises = Ai::GroupingService.suggest_praises(count: 5, exclude_praises: recent_logs)
+    @praises = Ai::GroupingService.suggest_praises(count: 5, exclude_praises: recent_logs, theme: params[:theme])
   rescue => e
     flash.now[:alert] = "AIからの提案を取得できませんでした: #{e.message}"
     @praises = []
@@ -19,7 +19,7 @@ class PraisesController < ApplicationController
     end
 
     if params[:commit] == "次へ" || params[:next]
-      redirect_to praises_path
+      redirect_to new_praise_path
     else
       redirect_to logs_path
     end

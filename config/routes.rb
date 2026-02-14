@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   post "/guests/login", to: "guests#login", as: :guests_login
 
-  resources :praises, only: [ :index, :create ]
+  resources :praises, only: [ :index, :create, :new ]
   resources :logs do
     collection do
       get :calendar

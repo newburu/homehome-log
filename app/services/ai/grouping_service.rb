@@ -2,18 +2,24 @@ module Ai
   class GroupingService
     require "gemini-ai"
 
-    MODELS = %w[gemini-1.5-flash gemini-1.5-pro gemini-1.0-pro].freeze
+    MODELS = %w[gemini-2.5-flash gemini-2.5-pro gemini-2.0-flash].freeze
 
-    def self.suggest_praises(count: 5, exclude_praises: [])
-      new.suggest_praises(count, exclude_praises)
+    def self.suggest_praises(count: 5, exclude_praises: [], theme: nil)
+      new.suggest_praises(count, exclude_praises, theme)
     end
 
-    def suggest_praises(count, exclude_praises)
+    def suggest_praises(count, exclude_praises, theme = nil)
+      # Normalize theme key to full string
+      selected_theme = if theme.present?
+                         THEME_MAPPING[theme] || (THEMES.include?(theme) ? theme : nil)
+      end
+      selected_theme ||= THEMES.sample
+
       last_error = nil
 
       MODELS.each do |model|
         begin
-          return fetch_from_gemini(model, count, exclude_praises)
+          return fetch_from_gemini(model, count, exclude_praises, selected_theme)
         rescue => e
           Rails.logger.warn "Gemini API failed with model #{model}: #{e.message}"
           last_error = e
@@ -24,7 +30,7 @@ module Ai
       # If all fail, return fallback mock data in development or raise error
       if Rails.env.development?
         Rails.logger.warn "All Gemini models failed. Returning mock data."
-        return mock_praises(count, exclude_praises)
+        return mock_praises(count, exclude_praises, selected_theme)
       end
 
       raise "All Gemini models failed. Last error: #{last_error&.message}"
@@ -32,30 +38,38 @@ module Ai
 
     private
 
-    THEMES = [
-      "仕事・勉強（タスク消化、集中、準備など）",
-      "家事・生活（掃除、料理、整理整頓など）",
-      "セルフケア・休息（睡眠、食事、リラックス、体調管理など）",
-      "人間関係・コミュニケーション（挨拶、感謝、連絡など）",
-      "趣味・創造活動（読書、創作、学びなど）",
-      "朝のルーティン（起床、身支度、朝食など）",
-      "夜のルーティン（入浴、歯磨き、就寝準備など）",
-      "感情・メンタル（自分の気持ちに気づく、深呼吸、ポジティブな思考など）"
-    ].freeze
+    THEME_MAPPING = {
+      "work" => "仕事・勉強（タスク消化、集中、準備など）",
+      "housework" => "家事・生活（掃除、料理、整理整頓など）",
+      "rest" => "セルフケア・休息（睡眠、食事、リラックス、体調管理など）",
+      "relationship" => "人間関係・コミュニケーション（挨拶、感謝、連絡など）",
+      "hobby" => "趣味・創造活動（読書、創作、学びなど）",
+      "morning" => "朝のルーティン（起床、身支度、朝食など）",
+      "night" => "夜のルーティン（入浴、歯磨き、就寝準備など）",
+      "emotion" => "感情・メンタル（自分の気持ちに気づく、深呼吸、ポジティブな思考など）"
+    }.freeze
 
-    def fetch_from_gemini(model, count, exclude_praises)
+    THEMES = THEME_MAPPING.values.freeze
+
+    def fetch_from_gemini(model, count, exclude_praises, theme = nil)
       Rails.logger.info "Attempting to fetch from Gemini with model: #{model}"
 
       client = Gemini.new(
         credentials: {
           service: "generative-language-api",
-          api_key: ENV["GOOGLE_API_KEY"]
+          api_key: ENV["GOOGLE_API_KEY"],
+          version: "v1beta"
         },
         options: { model: model, server_sent_events: false }
       )
 
-      theme = THEMES.sample
-      Rails.logger.info "Selected theme: #{theme}"
+      # Resolve theme from mapping if key provided, verify value if full string provided
+      selected_theme = if theme.present?
+                         THEME_MAPPING[theme] || (THEMES.include?(theme) ? theme : nil)
+      end
+      selected_theme ||= THEMES.sample
+
+      Rails.logger.info "Selected theme: #{selected_theme} (from input: #{theme})"
 
       exclude_text = ""
       if exclude_praises.any?
@@ -115,8 +129,33 @@ module Ai
       parsed["praises"]
     end
 
-    def mock_praises(count, exclude_praises)
-      all_praises = [
+    def mock_praises(count, exclude_praises, theme = nil)
+      theme_praises = {
+        "仕事・勉強（タスク消化、集中、準備など）" => [
+          "デスクに向かったこと",
+          "メールを1通返したこと",
+          "タスクリストを作ったこと",
+          "5分だけ集中できたこと",
+          "わからないことを質問できたこと"
+        ],
+        "家事・生活（掃除、料理、整理整頓など）" => [
+          "洗濯機を回したこと",
+          "ゴミをまとめたこと",
+          "洗い物を水につけたこと",
+          "机の上を少し片付けたこと",
+          "郵便物を確認したこと"
+        ],
+        "セルフケア・休息（睡眠、食事、リラックス、体調管理など）" => [
+          "水を一杯飲んだこと",
+          "深呼吸をしたこと",
+          "少し早めに布団に入ったこと",
+          "野菜を一口食べたこと",
+          "窓を開けて換気したこと"
+        ]
+      }
+
+      # Fallback generic praises
+      generic_praises = [
         "朝、目が覚めたこと",
         "深呼吸を一度したこと",
         "窓を開けて空気を入れ替えたこと",
@@ -134,11 +173,18 @@ module Ai
         "小さなごみを一つ拾ったこと"
       ]
 
+      candidates = theme ? (theme_praises[theme] || generic_praises) : generic_praises
+
+      # If theme specific praises are too few or not found, mix with generic
+      if candidates.size < count
+        candidates += generic_praises
+      end
+
       # Exclude praises that are already in the exclude list
-      available_praises = all_praises - exclude_praises
+      available_praises = candidates.uniq - exclude_praises
 
       # If we ran out of praises, fallback to all praises to avoid returning empty
-      return all_praises.sample(count) if available_praises.empty?
+      return candidates.sample(count) if available_praises.empty?
 
       available_praises.sample(count)
     end
