@@ -6,6 +6,7 @@ require "dotenv/load"
 set :application, ENV.fetch("APP_NAME", "homehome_log")
 set :repo_url, ENV.fetch("GIT_REPO_URL")
 set :deploy_to, ENV.fetch("DEPLOY_PATH")
+set :branch, "main"
 
 set :rbenv_type, :user
 set :rbenv_ruby, "4.0.0"
