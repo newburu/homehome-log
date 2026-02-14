@@ -2,7 +2,7 @@ module Ai
   class GroupingService
     require "gemini-ai"
 
-    MODELS = %w[gemini-1.5-flash gemini-1.5-pro].freeze
+    MODELS = %w[gemini-2.5-flash gemini-1.5-flash gemini-pro].freeze
 
     def self.suggest_praises(count: 5, exclude_praises: [], theme: nil)
       new.suggest_praises(count, exclude_praises, theme)
