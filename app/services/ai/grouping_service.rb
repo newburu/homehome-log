@@ -2,7 +2,7 @@ module Ai
   class GroupingService
     require "gemini-ai"
 
-    MODELS = %w[gemini-2.5-flash gemini-2.5-pro gemini-2.0-flash].freeze
+    MODELS = %w[gemini-1.5-flash gemini-1.5-pro].freeze
 
     def self.suggest_praises(count: 5, exclude_praises: [], theme: nil)
       new.suggest_praises(count, exclude_praises, theme)
@@ -122,8 +122,9 @@ module Ai
       text = candidates.first.dig("content", "parts", 0, "text") ||
              candidates.first.dig("content", "parts", 0, "text")
 
-      # Clean up markdown code blocks if present
-      json_text = text.gsub(/```json\n?/, "").gsub(/```/, "").strip
+      # Extract JSON object from text (handling markdown or extra text)
+      # Matches the first occurrence of { ... } including newlines
+      json_text = text[/{.*}/m] || text.gsub(/```json\n?/, "").gsub(/```/, "").strip
 
       parsed = JSON.parse(json_text)
       parsed["praises"]
