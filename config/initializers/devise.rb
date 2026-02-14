@@ -277,7 +277,7 @@ Devise.setup do |config|
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
   config.omniauth :google_oauth2, ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_CLIENT_SECRET"]
   config.omniauth :twitter2, ENV["TWITTER_CLIENT_ID"], ENV["TWITTER_CLIENT_SECRET"],
-    callback_url: "http://localhost:3000/users/auth/twitter2/callback",
+    callback_url: "#{ENV.fetch('APP_URL', 'http://localhost:3000')}/users/auth/twitter2/callback",
     scope: "tweet.read users.read"
 
   # ==> Warden configuration
